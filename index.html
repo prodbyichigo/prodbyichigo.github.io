@@ -4,9 +4,158 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>prodbyichigo</title>
-    <style></style>
+    <link rel="icon" href="assets/prodbyichigo.png">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <menu class="topbar">
+        <p class="menuname">prodbyichigo</p>
+        <div class="service-icons">
+            <img src="assets/services/Github.png" alt="GitHub" class="service-icon" onclick="window.open('https://github.com/prodbyichigo', '_blank')">
+            <img src="assets/services/Discord.png" alt="Discord" class="service-icon" onclick="window.open('https://discord.com/users/prodbyichigo', '_blank')">
+            <img src="assets/services/Roblox.png" alt="Roblox" class="service-icon" onclick="window.open('https://www.roblox.com/users/profile?username=uwusistaken', '_blank')">
+        </div>
+    </menu>
+    <h1 class="title">[prodbyichigo]</h1>
+    <p class="fineprint">The worst programmer of all time(?)</p>
+    <div id="accounts" class="accounts-container"></div>
+    <div id="projects" class="projects-container">
+        <div class="loading">This should only take a sec...</div>
+    </div>
 
+    <p class="versionID">[0.0.1]</p>
+
+    <script>
+        const Accounts = {
+            GitHub: 'prodbyichigo',
+            Discord: 'prodbyichigo',
+            RobloxMain: 'uwusistaken',
+            RobloxAlt: 'DrippilanteV2'
+        };
+
+        const accountLinks = {
+            GitHub: (user) => `https://github.com/${user}`,
+            Discord: (user) => `https://discord.com/users/${user}`,
+            Roblox: (user) => `https://www.roblox.com/users/profile?username=${user}`,
+            'Roblox Alt': (user) => `https://www.roblox.com/users/profile?username=${user}`
+        };
+        
+        const languageColors = {
+            JavaScript: '#f1e05a',
+            Python: '#3572A5',
+            HTML: '#e34c26',
+            CSS: '#563d7c',
+            Java: '#b07219',
+            TypeScript: '#2b7489',
+            C: '#555555',
+            'C++': '#f34b7d',
+            'C#': '#178600',
+            Go: '#00ADD8',
+            Rust: '#dea584',
+            Ruby: '#701516',
+            PHP: '#4F5D95',
+            Swift: '#ffac45',
+            Kotlin: '#F18E33',
+            AutoHotkey: '#14BA4F'
+        };
+
+        function createAccountCard(platform, username) {
+            const card = document.createElement('div');
+            card.className = 'account-card';
+            
+            const link = accountLinks[platform] ? accountLinks[platform](username) : '#';
+            card.onclick = () => window.open(link, '_blank');
+
+            card.innerHTML = `
+                <div class="account-platform">${platform}</div>
+                <div class="account-username">${username}</div>
+            `;
+
+            return card;
+        }
+
+        function loadAccounts() {
+            const container = document.getElementById('accounts');
+            
+            Object.entries(Accounts).forEach(([platform, username]) => {
+                const card = createAccountCard(platform, username);
+                container.appendChild(card);
+            });
+        }
+
+        async function FetchProj(username) {
+            const res = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
+            if (!res.ok) throw new Error("Failed to fetch repos");
+
+            const repos = await res.json();
+
+            const projects = repos.map(repo => ({
+                name: repo.name,
+                url: repo.html_url,
+                description: repo.description || 'No description available',
+                stars: repo.stargazers_count,
+                language: repo.language,
+                updated: repo.updated_at
+            }));
+
+            return projects;
+        }
+
+        function createProjectCard(project) {
+            const card = document.createElement('div');
+            card.className = 'project-card';
+            card.onclick = () => window.open(project.url, '_blank');
+
+            const languageColor = languageColors[project.language] || 'rgb(255, 0, 0)';
+            
+            card.innerHTML = `
+                <h3 class="project-name">${project.name}</h3>
+                <p class="project-description">${project.description}</p>
+                <div class="project-meta">
+                    ${project.language ? `
+                        <span class="meta-item">
+                            <span class="language-dot" style="background-color: ${languageColor}"></span>
+                            ${project.language}
+                        </span>
+                    ` : ''}
+                    <span class="meta-item stars">
+                        ★ ${project.stars}
+                    </span>
+                    <span class="meta-item">
+                        Updated: ${new Date(project.updated).toLocaleDateString()}
+                    </span>
+                </div>
+            `;
+
+            return card;
+        }
+
+        async function OnLoad() {
+            loadAccounts();
+
+            const container = document.getElementById('projects');
+            
+            try {
+                const projects = await FetchProj('prodbyichigo');
+                
+                container.innerHTML = '';
+                
+                if (projects.length === 0) {
+                    container.innerHTML = '<div class="error">Wow, did I delete all my stuff again?</div>';
+                    return;
+                }
+
+                projects.forEach(project => {
+                    const card = createProjectCard(project);
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Wow man, I really outdid myself this time. Code stopped workin, dm me? Pls?:', error);
+                container.innerHTML = `<div class="error">Failed to load projects: ${error.message}</div>`;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', OnLoad);
+    </script>
 </body>
 </html>

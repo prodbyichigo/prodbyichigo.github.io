@@ -1,0 +1,177 @@
+@font-face {
+    font-family: "Cascadia";
+    src: url("assets/fonts/CascadiaMono.ttf") format("truetype");
+    font-weight: normal;
+}
+
+body {
+    background-color: black;
+    font-family: "Cascadia", sans-serif;
+    color: rgb(255, 0, 0);
+    user-select: none;
+}
+
+.title {
+    padding-top: 30px;
+    text-align: center;
+}
+
+.fineprint {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+    color: rgb(255, 0, 0);
+}
+
+.projects-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.project-card {
+    background: #0a0a0a;
+    border: 1px solid rgb(255, 0, 0);
+    border-radius: 8px;
+    padding: 1.3rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.project-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+}
+
+.project-name {
+    font-size: 1.3rem;
+    color: rgb(255, 0, 0);
+    margin-bottom: 0.5rem;
+    text-decoration: none;
+}
+
+.project-description {
+    color: rgba(255, 0, 0, 0.7);
+    margin-bottom: 1rem;
+    min-height: 3rem;
+}
+
+.project-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.9rem;
+    color: rgba(255, 0, 0, 0.7);
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.language-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.stars {
+    color: rgb(255, 0, 0);
+}
+
+.error {
+    text-align: center;
+    padding: 2rem;
+    color: rgb(255, 0, 0);
+    font-size: 1.1rem;
+}
+
+.versionID {
+    position: fixed;
+    bottom: -10px;
+    right: 3px;
+}
+
+.accounts-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    max-width: 900px;
+    margin: 0 auto 3rem auto;
+    padding: 0 2rem;
+}
+
+.account-card {
+    background: #0a0a0a;
+    border: 1px solid rgb(255, 0, 0);
+    border-radius: 6px;
+    padding: 0.8rem 1.2rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    min-width: 150px;
+    text-align: center;
+}
+
+.account-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3);
+}
+
+.account-platform {
+    font-size: 0.85rem;
+    color: rgba(255, 0, 0, 0.7);
+    margin-bottom: 0.3rem;
+}
+
+.account-username {
+    font-size: 1rem;
+    color: rgb(255, 0, 0);
+    font-weight: bold;
+}
+
+.topbar {
+    background: #0a0a0a;
+    border: 1px solid rgb(255, 0, 0);
+    border-radius: 2px;
+    padding: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.favicon {
+    width: 32px;
+    height: 32px;
+    display: block;
+    
+}
+
+.service-icons {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.service-icon {
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.service-icon:hover {
+    transform: scale(1.1);
+    opacity: 0.8;
+}
