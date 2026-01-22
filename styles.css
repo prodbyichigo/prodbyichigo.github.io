@@ -5,9 +5,9 @@
 }
 
 body {
-    background-color: black;
+    background-color: rgb(235, 109, 109);
     font-family: "Cascadia", sans-serif;
-    color: rgb(4, 0, 255);
+    color: rgb(255, 0, 0);
     user-select: none;
 }
 
