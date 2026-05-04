@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wiki</title>
+  <link rel="stylesheet" href="../stylesheet/global.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+</head>
+<body>
+
+  <aside id="sidebar">
+    <div id="sidebar-logo">
+      <div class="logo-tag">BeeSwarm Wiki</div>
+    </div>
+    <nav>
+      <div class="nav-section-title">Pages</div>
+      <div id="nav-links"></div>
+    </nav>
+  </aside>
+
+  <div id="main">
+    <header id="topbar">
+      <div id="breadcrumb">
+        <span>wiki</span>
+        <span class="sep">/</span>
+        <span id="breadcrumb-page">—</span>
+      </div>
+      <div id="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input id="search-input" type="text" placeholder="Search pages…" autocomplete="off" />
+        <div id="search-results"></div>
+      </div>
+      <div class="status-dot" title="Online"></div>
+    </header>
+
+    <div id="content">
+      <div id="loading"><div class="spinner"></div>Loading document…</div>
+      <div id="article" style="display:none"></div>
+    </div>
+
+    <footer id="footer">
+      <span>BeeSwarm Wiki</span>
+      <span>·</span>
+      <span id="footer-file" class="footer-accent">—</span>
+      <span>·</span>
+      <span id="footer-time">—</span>
+    </footer>
+  </div>
+
+  <!-- ── Theme Switcher ── -->
+  <div id="theme-switcher">
+    <div id="theme-panel">
+      <div class="theme-panel-header">Themes</div>
+      <div id="theme-list"></div>
+    </div>
+    <button id="theme-toggle">
+      <span class="toggle-icon">◑</span>
+      <span id="theme-toggle-label">Theme</span>
+    </button>
+  </div>
+
+  <script>
+    const PAGES = [
+      { label: 'Caustic Wax', file: '../data/CausticWax.md' },
+      { label: 'Swirled Wax', file: '../data/SwirledWax.md' },
+      { label: 'Planters', file: '../data/Planters.md' },
+      { label: 'Macro', file: '../data/Macro.md'},
+      { label: 'Contributors', file: '../data/Contributors.md'},
+    ];
+
+    const THEME_FILES = ['idote.json', 'arctic.json', 'terminal.json'];
+    const THEMES_DIR  = '../themes/';
+
+    marked.setOptions({ breaks: true, gfm: true });
+
+    let currentPage = null;
+    let pageCache = {};
+
+    function buildNav() {
+      const nav = document.getElementById('nav-links');
+      PAGES.forEach((page, i) => {
+        const el = document.createElement('a');
+        el.className = 'nav-item';
+        el.textContent = page.label;
+        el.dataset.index = i;
+        el.addEventListener('click', () => loadPage(i));
+        nav.appendChild(el);
+      });
+    }
+
+    async function loadPage(index) {
+      const page = PAGES[index];
+      if (!page) return;
+
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      document.querySelector(`.nav-item[data-index="${index}"]`)?.classList.add('active');
+
+      const article = document.getElementById('article');
+      const loading = document.getElementById('loading');
+      article.style.display = 'none';
+      loading.style.display = 'flex';
+
+      document.getElementById('breadcrumb-page').textContent = page.label;
+      document.getElementById('footer-file').textContent = page.file.split('/').pop();
+
+      try {
+        const res = await fetch(page.file);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const md = await res.text();
+        pageCache[index] = md;
+        article.innerHTML = marked.parse(md);
+
+        const lastMod = res.headers.get('Last-Modified');
+        document.getElementById('footer-time').textContent = lastMod
+          ? new Date(lastMod).toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' })
+          : new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
+
+        loading.style.display = 'none';
+        article.style.display = 'block';
+        article.style.animation = 'none';
+        article.offsetHeight;
+        article.style.animation = '';
+        currentPage = index;
+        document.title = `${page.label} · BeeSwarm Wiki`;
+
+      } catch (err) {
+        loading.style.display = 'none';
+        article.style.display = 'block';
+        article.innerHTML = `
+          <h1>Error loading page</h1>
+          <p>Could not load <code>${page.file}</code></p>
+          <blockquote>${err.message}</blockquote>
+          <p>Make sure you're serving via a local server, not <code>file://</code>.</p>
+        `;
+      }
+    }
+
+    const searchInput   = document.getElementById('search-input');
+    const searchResults = document.getElementById('search-results');
+
+    async function primeCache() {
+      await Promise.all(PAGES.map(async (page, i) => {
+        if (pageCache[i]) return;
+        try {
+          const r = await fetch(page.file);
+          if (r.ok) pageCache[i] = await r.text();
+        } catch(_) {}
+      }));
+    }
+
+    function doSearch(query) {
+      const q = query.trim().toLowerCase();
+      searchResults.innerHTML = '';
+
+      if (!q) { searchResults.classList.remove('open'); return; }
+
+      const matches = [];
+      PAGES.forEach((page, i) => {
+        const content = (pageCache[i] || '').toLowerCase();
+        const labelMatch = page.label.toLowerCase().includes(q);
+        const contentIdx = content.indexOf(q);
+
+        if (labelMatch || contentIdx !== -1) {
+          let snippet = '';
+          if (contentIdx !== -1) {
+            const start = Math.max(0, contentIdx - 40);
+            const end   = Math.min(content.length, contentIdx + 80);
+            snippet = (pageCache[i] || '').slice(start, end)
+              .replace(/<[^>]*>/g, '')
+              .replace(/!\[.*?\]\(.*?\)/g, '')
+              .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+              .replace(/[#*`>_~|\\-]/g, '')
+              .replace(/\s+/g, ' ')
+              .trim();
+            const re = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            snippet = snippet.replace(re, '<mark>$1</mark>');
+          }
+          matches.push({ index: i, label: page.label, snippet });
+        }
+      });
+
+      if (matches.length === 0) {
+        searchResults.innerHTML = `<div class="search-empty">No results for "${query}"</div>`;
+        searchResults.classList.add('open');
+        return;
+      }
+
+      matches.forEach(m => {
+        const el = document.createElement('div');
+        el.className = 'search-result';
+        el.innerHTML = `
+          <span class="search-result-title">${m.label}</span>
+          ${m.snippet ? `<span class="search-result-snippet">${m.snippet}…</span>` : ''}
+        `;
+        el.addEventListener('click', () => {
+          loadPage(m.index);
+          searchInput.value = '';
+          searchResults.classList.remove('open');
+        });
+        searchResults.appendChild(el);
+      });
+
+      searchResults.classList.add('open');
+    }
+
+    searchInput.addEventListener('input', e => doSearch(e.target.value));
+    searchInput.addEventListener('focus', e => { if (e.target.value) doSearch(e.target.value); primeCache(); });
+    searchInput.addEventListener('click', e => e.stopPropagation());
+    searchResults.addEventListener('click', e => e.stopPropagation());
+    document.addEventListener('click', () => searchResults.classList.remove('open'));
+
+    let themes = [];
+    let activeTheme = null;
+
+    async function loadThemes() {
+      try {
+        themes = await Promise.all(
+          THEME_FILES.map(async f => {
+            const r = await fetch(THEMES_DIR + f);
+            if (!r.ok) throw new Error('Failed: ' + f);
+            return r.json();
+          })
+        );
+        renderThemeList();
+        applyTheme(themes[0]);
+      } catch(e) {
+        console.warn('Theme load error:', e);
+      }
+    }
+
+    function applyTheme(theme) {
+      const root = document.documentElement;
+      ['--bg','--bg-panel','--bg-hover','--border','--border-hi',
+       '--accent','--accent-dim','--green','--amber','--red',
+       '--text','--text-dim','--text-hi'].forEach(v => {
+        if (theme[v]) root.style.setProperty(v, theme[v]);
+      });
+      activeTheme = theme.name;
+      document.getElementById('theme-toggle-label').textContent = theme.name;
+      document.querySelectorAll('.theme-option').forEach(el => {
+        el.classList.toggle('active', el.dataset.name === theme.name);
+      });
+    }
+
+    function renderThemeList() {
+      const list = document.getElementById('theme-list');
+      list.innerHTML = '';
+      themes.forEach(theme => {
+        const el = document.createElement('div');
+        el.className = 'theme-option';
+        el.dataset.name = theme.name;
+        el.innerHTML = `
+          <div class="theme-swatches">
+            <div class="theme-swatch" style="background:${theme['--bg']};border-color:${theme['--border-hi']}"></div>
+            <div class="theme-swatch" style="background:${theme['--accent']}"></div>
+            <div class="theme-swatch" style="background:${theme['--text']}"></div>
+          </div>
+          <div class="theme-info">
+            <span class="theme-name">${theme.name}</span>
+            <span class="theme-desc">${theme.description || ''}</span>
+          </div>
+          <div class="theme-active-dot"></div>
+        `;
+        el.addEventListener('click', () => { applyTheme(theme); closePanel(); });
+        list.appendChild(el);
+      });
+    }
+
+    function closePanel() {
+      document.getElementById('theme-panel').classList.remove('open');
+    }
+
+    document.getElementById('theme-toggle').addEventListener('click', e => {
+      e.stopPropagation();
+      document.getElementById('theme-panel').classList.toggle('open');
+    });
+
+    document.addEventListener('click', e => {
+      if (!document.getElementById('theme-switcher').contains(e.target)) closePanel();
+    });
+
+    buildNav();
+    if (PAGES.length > 0) loadPage(0);
+    loadThemes();
+    primeCache();
+  </script>
+</body>
+</html>

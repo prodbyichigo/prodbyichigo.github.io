@@ -1,0 +1,17 @@
+{
+  "name": "Terminal",
+  "description": "Classic green phosphor",
+  "--bg":         "#000a00",
+  "--bg-panel":   "#001500",
+  "--bg-hover":   "#002000",
+  "--border":     "#003300",
+  "--border-hi":  "#005500",
+  "--accent":     "#00ff41",
+  "--accent-dim": "#004d14",
+  "--green":      "#00ff41",
+  "--amber":      "#ffe000",
+  "--red":        "#ff4444",
+  "--text":       "#00cc33",
+  "--text-dim":   "#006618",
+  "--text-hi":    "#ccffdd"
+}

@@ -168,25 +168,74 @@ body {
     display: block;
 }
 
-.service-icons {
+.topbar-actions {
     display: flex;
-    gap: 1rem;
     align-items: center;
+    gap: 0.45rem;
+}
+
+.service-icon-link,
+.wiki-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 34px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: transform 0.2s, opacity 0.2s, border-color 0.2s, background-color 0.2s;
+}
+
+.service-icon-link {
+    width: 34px;
 }
 
 .service-icon {
     width: 24px;
     height: 24px;
-    cursor: pointer;
-    transition: transform 0.2s, opacity 0.2s;
 }
 
 .menuname {
-    width: 10px;
+    margin: 0;
     padding-left: 20px;
 }
 
-.service-icon:hover {
-    transform: scale(1.1);
+.service-icon-link:hover,
+.wiki-link:hover {
+    transform: translateY(-1px);
     opacity: 0.8;
+    border-color: var(--accent-color);
+    background-color: rgba(90, 112, 255, 0.08);
+}
+
+.wiki-link {
+    padding: 0 0.85rem;
+    font-size: 0.9rem;
+    border-color: var(--accent-color);
+}
+
+@media (max-width: 520px) {
+    .topbar {
+        gap: 1rem;
+    }
+
+    .menuname {
+        padding-left: 0.4rem;
+    }
+
+    .topbar-actions {
+        gap: 0.25rem;
+    }
+
+    .service-icon-link {
+        width: 30px;
+        height: 30px;
+    }
+
+    .wiki-link {
+        height: 30px;
+        padding: 0 0.55rem;
+        font-size: 0.82rem;
+    }
 }

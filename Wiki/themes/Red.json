@@ -1,0 +1,17 @@
+{
+  "name": "Idote",
+  "description": "Red on black",
+  "--bg":         "#0a0000",
+  "--bg-panel":   "#110000",
+  "--bg-hover":   "#1c0000",
+  "--border":     "#2a0000",
+  "--border-hi":  "#4a0a0a",
+  "--accent":     "#e53535",
+  "--accent-dim": "#5a0a0a",
+  "--green":      "#e53535",
+  "--amber":      "#ff6b35",
+  "--red":        "#ff2020",
+  "--text":       "#d4aaaa",
+  "--text-dim":   "#6b3333",
+  "--text-hi":    "#ffe8e8"
+}

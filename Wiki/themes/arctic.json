@@ -1,0 +1,17 @@
+{
+  "name": "Arctic",
+  "description": "Cool blue on dark",
+  "--bg":         "#0d0f13",
+  "--bg-panel":   "#12151b",
+  "--bg-hover":   "#1a1e28",
+  "--border":     "#1f2433",
+  "--border-hi":  "#2e3650",
+  "--accent":     "#4fc3f7",
+  "--accent-dim": "#1a4a6b",
+  "--green":      "#4ade80",
+  "--amber":      "#fbbf24",
+  "--red":        "#f87171",
+  "--text":       "#c8d3e8",
+  "--text-dim":   "#5a6a8a",
+  "--text-hi":    "#e8edf8"
+}
